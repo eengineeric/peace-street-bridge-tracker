@@ -1,0 +1,41 @@
+import Link from "next/link";
+import { ReportList } from "@/components/report-list";
+import { StatusCard } from "@/components/status-card";
+import { getConfirmedReports } from "@/lib/reports";
+import { isSupabaseConfigured } from "@/lib/config";
+
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const reports = await getConfirmedReports(100);
+  const thisYear = new Date().getFullYear();
+  const yearCount = reports.filter((r) => r.incident_date.startsWith(String(thisYear))).length;
+
+  return (
+    <main className="mx-auto min-h-screen max-w-5xl px-5 py-10 sm:py-16">
+      <header className="flex flex-col gap-5 border-b border-white/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.22em] text-sky-300">Raleigh, North Carolina</p>
+          <h1 className="mt-2 text-4xl font-black tracking-tight sm:text-6xl">Peace Street Bridge Tracker</h1>
+          <p className="mt-3 max-w-2xl text-slate-400">A community dashboard for verified truck strikes at the railroad bridge over Peace Street.</p>
+        </div>
+        <Link href="/admin" className="text-sm font-semibold text-sky-300 hover:text-sky-200">Admin review →</Link>
+      </header>
+
+      <div className="mt-8 space-y-6">
+        {!isSupabaseConfigured && (
+          <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+            Demo mode: connect Supabase using the README instructions to enable shared data.
+          </div>
+        )}
+        <StatusCard reports={reports} />
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5"><p className="text-sm text-slate-400">Confirmed this year</p><p className="mt-2 text-3xl font-black">{yearCount}</p></div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5"><p className="text-sm text-slate-400">All-time records</p><p className="mt-2 text-3xl font-black">{reports.length}</p></div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5"><p className="text-sm text-slate-400">Review model</p><p className="mt-2 text-lg font-bold">Human confirmed</p></div>
+        </div>
+        <ReportList reports={reports} />
+      </div>
+    </main>
+  );
+}
