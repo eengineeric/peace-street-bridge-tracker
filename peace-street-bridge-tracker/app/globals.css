@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+:root { color-scheme: dark; }
+body { min-height: 100vh; background: #07111f; color: #eef4ff; }
+a { text-underline-offset: 3px; }
