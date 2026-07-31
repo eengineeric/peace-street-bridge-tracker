@@ -17,9 +17,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Show repository files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Files in repository root:"
+          ls -la
+          echo "Searching for package.json:"
+          find . -maxdepth 4 -name "package.json" -print
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
