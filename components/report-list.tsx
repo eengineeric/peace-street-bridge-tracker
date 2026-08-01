@@ -9,7 +9,7 @@ function fmtDate(iso: string, precision?: string) {
 
 export function ReportList({ incidents }: { incidents: BridgeIncident[] }) {
   return (
-    <section id="incidents" className="rounded-3xl bg-white p-5 text-slate-950 shadow-xl sm:p-7">
+    <section id="incidents" className="scroll-mt-32 rounded-3xl bg-white p-5 text-slate-950 shadow-xl sm:p-7">
       <div className="flex flex-col gap-2 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Lifetime archive</p>
@@ -24,7 +24,7 @@ export function ReportList({ incidents }: { incidents: BridgeIncident[] }) {
           {incidents.map((incident) => {
             const image = incident.image_url || incident.sources?.find((s) => s.image_url)?.image_url;
             return (
-              <article key={incident.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+              <article id={`incident-${incident.id}`} key={incident.id} className="scroll-mt-32 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
                 <div className="relative h-48 bg-slate-200 bg-cover bg-center" style={{ backgroundImage: `url(${image || "/bridge.svg"})` }}>
                   {!image && <div className="absolute inset-x-0 bottom-0 bg-slate-950/75 px-3 py-2 text-xs font-semibold text-white">No archived incident photo located</div>}
                 </div>

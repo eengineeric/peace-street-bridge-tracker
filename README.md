@@ -1,3 +1,7 @@
+## Version 2.5.5 — functional header navigation
+
+Adds working Home, Incidents, Stats, Gallery, About, Admin access, and strike-alert controls to the approved homepage layout.
+
 # Version 2.5.1 visual update
 
 This patch replaces the homepage hero with the preferred 12 ft 4 in clearance artwork and removes duplicate live overlay text from the hero.
