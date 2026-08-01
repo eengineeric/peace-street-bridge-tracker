@@ -11,7 +11,7 @@ function urlBase64ToUint8Array(base64String: string) {
 
 type AlertState = "checking" | "unsupported" | "disabled" | "enabling" | "enabled" | "error";
 
-export function NotificationButton({ prominent = false }: { prominent?: boolean }) {
+export function NotificationButton() {
   const [state, setState] = useState<AlertState>("checking");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -87,9 +87,10 @@ export function NotificationButton({ prominent = false }: { prominent?: boolean 
     }
   }
 
+  if (state === "unsupported") return null;
+
   const enabled = state === "enabled";
-  const unsupported = state === "unsupported";
-  const busy = state === "checking" || state === "enabling" || unsupported;
+  const busy = state === "checking" || state === "enabling";
   const label =
     state === "enabled"
       ? "✓ Strike alerts enabled"
@@ -99,34 +100,25 @@ export function NotificationButton({ prominent = false }: { prominent?: boolean 
           ? "Enabling strike alerts…"
           : state === "error"
             ? "Retry strike alerts"
-            : unsupported
-              ? "Strike alerts unavailable"
-              : "Enable strike alerts";
-
-  const wrapperClass = prominent
-    ? "flex w-full min-w-0 flex-col items-stretch gap-1.5"
-    : "flex min-w-0 flex-col items-start gap-1.5";
-
-  const buttonClass = enabled
-    ? `${prominent ? "w-full min-h-12 text-sm" : "max-w-full text-xs sm:text-sm"} rounded-xl border border-emerald-400/50 bg-emerald-400/15 px-4 py-3 font-black leading-4 text-emerald-100 shadow-lg shadow-emerald-950/20 hover:bg-emerald-400/20`
-    : `${prominent ? "w-full min-h-12 text-sm" : "max-w-full text-xs sm:text-sm"} rounded-xl border border-amber-300/50 bg-amber-300/12 px-4 py-3 font-black leading-4 text-amber-100 shadow-lg shadow-amber-950/20 hover:bg-amber-300/20 disabled:cursor-wait disabled:opacity-80`;
+            : "Enable strike alerts";
 
   return (
-    <div className={wrapperClass}>
+    <div className="flex min-w-0 flex-col items-start gap-1.5">
       <button
         type="button"
         onClick={enabled ? disable : enable}
         disabled={busy}
         aria-pressed={enabled}
-        className={buttonClass}
+        className={
+          enabled
+            ? "max-w-full rounded-xl border border-emerald-400/40 bg-emerald-400/15 px-3 py-2 text-xs font-bold leading-4 text-emerald-200 hover:bg-emerald-400/20 sm:px-4 sm:text-sm"
+            : "max-w-full rounded-xl border border-amber-300/35 bg-amber-300/10 px-3 py-2 text-xs font-bold leading-4 text-amber-200 hover:bg-amber-300/15 disabled:cursor-wait disabled:opacity-70 sm:px-4 sm:text-sm"
+        }
       >
         <span aria-hidden="true" className="mr-2">🔔</span>
         {label}
       </button>
-      {unsupported ? (
-        <span className="text-[0.68rem] leading-4 text-slate-300 sm:text-xs">Notifications are unavailable in this browser or the push key is not configured.</span>
-      ) : null}
-      {errorMessage ? <span className="max-w-[22rem] text-[0.68rem] leading-4 text-rose-300 sm:max-w-xs sm:text-xs">{errorMessage}</span> : null}
+      {errorMessage ? <span className="max-w-[18rem] text-[0.68rem] leading-4 text-rose-300 sm:max-w-xs sm:text-xs">{errorMessage}</span> : null}
     </div>
   );
 }
