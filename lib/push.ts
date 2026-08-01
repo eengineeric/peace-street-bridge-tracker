@@ -62,6 +62,42 @@ export async function removePushSubscription(endpoint: string) {
   await supabase<unknown>(`push_subscriptions?endpoint=eq.${encodeURIComponent(endpoint)}`, { method: "DELETE" });
 }
 
+
+export async function sendTestPush() {
+  if (!isSupabaseConfigured || !configureWebPush()) return { sent: 0, failed: 0, disabled: true };
+
+  const subscriptions = await supabase<PushSubscriptionRow[]>("push_subscriptions?select=id,endpoint,p256dh,auth");
+  const payload = JSON.stringify({
+    title: "🚚 Peace Street Bridge Tracker",
+    body: "Test notification — strike alerts are working.",
+    url: "/",
+    tag: `bridge-test-${Date.now()}`,
+  });
+
+  let sent = 0;
+  let failed = 0;
+  for (const row of subscriptions) {
+    try {
+      await webpush.sendNotification(
+        { endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } },
+        payload,
+        { TTL: 60 * 10 },
+      );
+      sent += 1;
+    } catch (error) {
+      failed += 1;
+      const statusCode = typeof error === "object" && error && "statusCode" in error
+        ? Number((error as { statusCode?: number }).statusCode)
+        : 0;
+      if (statusCode === 404 || statusCode === 410) {
+        await removePushSubscription(row.endpoint).catch(() => undefined);
+      }
+    }
+  }
+
+  return { sent, failed, disabled: false };
+}
+
 export async function sendStrikePush(input: { incidentId: string; incidentAt: string; title: string; truckType?: string | null }) {
   if (!isSupabaseConfigured || !configureWebPush()) return { sent: 0, failed: 0, disabled: true };
 

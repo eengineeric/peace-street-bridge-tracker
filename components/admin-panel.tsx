@@ -19,6 +19,15 @@ export function AdminPanel() {
     setMessage(`Loaded ${data.reports?.length ?? 0} source records.`);
   }
 
+  async function sendTestNotification() {
+    setBusy(true);
+    const response = await fetch("/api/admin/test-push", { method: "POST", headers: { "x-admin-secret": secret } });
+    const data = (await response.json()) as { sent?: number; failed?: number; error?: string };
+    setBusy(false);
+    if (!response.ok) return setMessage(data.error ?? "Test notification failed.");
+    setMessage(`Test notification sent to ${data.sent ?? 0} device(s)${data.failed ? `; ${data.failed} failed` : ""}.`);
+  }
+
   async function runScan() {
     setBusy(true);
     const response = await fetch("/api/admin/scan", { method: "POST", headers: { "x-admin-secret": secret } });
@@ -47,6 +56,7 @@ export function AdminPanel() {
           <input id="secret" type="password" value={secret} onChange={(event) => setSecret(event.target.value)} className="min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-900 px-4 py-3" />
           <button disabled={busy || !secret} onClick={saveAndLoad} className="rounded-xl bg-sky-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-50">Load diagnostics</button>
           <button disabled={busy || !secret} onClick={runScan} className="rounded-xl border border-white/15 px-5 py-3 font-bold disabled:opacity-50">Run scan now</button>
+          <button disabled={busy || !secret} onClick={sendTestNotification} className="rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-5 py-3 font-bold text-emerald-200 disabled:opacity-50">Send test notification</button>
         </div>
         <p className="mt-3 text-sm text-slate-400">{busy ? "Working…" : message}</p>
       </section>
