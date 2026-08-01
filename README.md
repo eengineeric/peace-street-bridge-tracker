@@ -192,3 +192,9 @@ The strike-alert button now has explicit checking, enabling, enabled, and retry 
 - Removed duplicate/nonfunctional homepage navigation tabs.
 - Uppercase hero headline retained in the artwork.
 - Improved `/admin` contrast for password dots, scan controls, and test-notification controls.
+
+
+## Version 2.5.7
+- Uses the approved uphill Peace Street bridge hero with the peeled sardine can.
+- Keeps exactly one functional navigation row; no navigation or alert controls are baked into the hero image.
+- Updates the installable phone icon to the approved bridge + sardine can + acorn artwork.
