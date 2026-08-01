@@ -4,6 +4,7 @@ create extension if not exists pgcrypto;
 create table if not exists public.bridge_incidents (
   id uuid primary key default gen_random_uuid(),
   incident_at timestamptz not null,
+  incident_date date not null unique,
   title text not null,
   confidence double precision not null default 0.9 check (confidence >= 0 and confidence <= 1),
   created_at timestamptz not null default now(),
@@ -29,6 +30,7 @@ create table if not exists public.bridge_reports (
 );
 
 create index if not exists bridge_incidents_incident_at_idx on public.bridge_incidents(incident_at desc);
+create unique index if not exists bridge_incidents_incident_date_uidx on public.bridge_incidents(incident_date);
 create index if not exists bridge_reports_status_idx on public.bridge_reports(status);
 create index if not exists bridge_reports_incident_id_idx on public.bridge_reports(incident_id);
 create index if not exists bridge_reports_detected_incident_at_idx on public.bridge_reports(detected_incident_at desc);
@@ -47,25 +49,63 @@ declare
   v_existing_report public.bridge_reports%rowtype;
   v_incident public.bridge_incidents%rowtype;
   v_report public.bridge_reports%rowtype;
+  v_incident_date date := (p_detected_incident_at at time zone 'America/New_York')::date;
   v_created boolean := false;
 begin
   perform pg_advisory_xact_lock(hashtext('peace-street-bridge-incident-registration'));
-  select * into v_existing_report from public.bridge_reports where source_url = p_source_url limit 1;
+
+  select * into v_existing_report
+  from public.bridge_reports
+  where source_url = p_source_url
+  limit 1;
+
   if found then
-    return jsonb_build_object('report_id', v_existing_report.id, 'incident_id', v_existing_report.incident_id, 'created_incident', false, 'duplicate_source', true);
+    return jsonb_build_object(
+      'report_id', v_existing_report.id,
+      'incident_id', v_existing_report.incident_id,
+      'created_incident', false,
+      'duplicate_source', true
+    );
   end if;
-  select * into v_incident from public.bridge_incidents
-  where incident_at between p_detected_incident_at - interval '30 minutes' and p_detected_incident_at + interval '30 minutes'
-  order by abs(extract(epoch from (incident_at - p_detected_incident_at))) limit 1;
+
+  -- The public tracker counts at most one incident per Raleigh calendar day.
+  -- Every additional article or separately timed strike on that date is attached
+  -- as another source to the same daily incident.
+  select * into v_incident
+  from public.bridge_incidents
+  where incident_date = v_incident_date
+  limit 1;
+
   if not found then
-    insert into public.bridge_incidents (incident_at, title, confidence) values (p_detected_incident_at, p_title, p_confidence) returning * into v_incident;
+    insert into public.bridge_incidents (incident_at, incident_date, title, confidence)
+    values (p_detected_incident_at, v_incident_date, p_title, p_confidence)
+    returning * into v_incident;
     v_created := true;
   else
-    update public.bridge_incidents set confidence = greatest(confidence, p_confidence), updated_at = now() where id = v_incident.id;
+    update public.bridge_incidents
+    set incident_at = least(incident_at, p_detected_incident_at),
+        confidence = greatest(confidence, p_confidence),
+        updated_at = now()
+    where id = v_incident.id
+    returning * into v_incident;
   end if;
-  insert into public.bridge_reports (incident_id,title,source_url,source_name,published_at,incident_date,detected_incident_at,status,confidence,extraction_method,excerpt)
-  values (v_incident.id,p_title,p_source_url,coalesce(nullif(p_source_name,''),'Unknown source'),p_published_at,(p_detected_incident_at at time zone 'America/New_York')::date,p_detected_incident_at,case when v_created then 'auto_confirmed' else 'duplicate' end,p_confidence,p_extraction_method,left(p_excerpt,800)) returning * into v_report;
-  return jsonb_build_object('report_id',v_report.id,'incident_id',v_incident.id,'created_incident',v_created,'duplicate_source',false);
+
+  insert into public.bridge_reports (
+    incident_id, title, source_url, source_name, published_at, incident_date,
+    detected_incident_at, status, confidence, extraction_method, excerpt
+  ) values (
+    v_incident.id, p_title, p_source_url, coalesce(nullif(p_source_name, ''), 'Unknown source'),
+    p_published_at, v_incident_date, p_detected_incident_at,
+    case when v_created then 'auto_confirmed' else 'duplicate' end,
+    p_confidence, p_extraction_method, left(p_excerpt, 800)
+  ) returning * into v_report;
+
+  return jsonb_build_object(
+    'report_id', v_report.id,
+    'incident_id', v_incident.id,
+    'created_incident', v_created,
+    'duplicate_source', false
+  );
 end;
 $$;
 

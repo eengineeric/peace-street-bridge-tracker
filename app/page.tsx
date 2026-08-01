@@ -34,7 +34,7 @@ export default async function HomePage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5"><p className="text-sm text-slate-400">Incidents this year</p><p className="mt-2 text-3xl font-black">{yearCount}</p></div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5"><p className="text-sm text-slate-400">All-time incidents</p><p className="mt-2 text-3xl font-black">{incidents.length}</p></div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5"><p className="text-sm text-slate-400">Deduplication</p><p className="mt-2 text-lg font-bold">30-minute window</p></div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5"><p className="text-sm text-slate-400">Deduplication</p><p className="mt-2 text-lg font-bold">One per calendar day</p></div>
         </div>
         <ReportList incidents={incidents} />
       </div>
