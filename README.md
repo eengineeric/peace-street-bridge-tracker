@@ -1,3 +1,7 @@
+# Peace Street Bridge Tracker — Version 2.5.9
+
+Mobile layout update: preserves the desktop experience while adding safe-area support, a non-clipping two-line phone title, an always-visible strike-alert control, a compact mobile navigation menu, responsive hero sizing, and two-column phone stat cards.
+
 ## Version 2.5.5 — functional header navigation
 
 Adds working Home, Incidents, Stats, Gallery, About, Admin access, and strike-alert controls to the approved homepage layout.

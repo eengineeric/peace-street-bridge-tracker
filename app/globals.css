@@ -6,3 +6,10 @@
 html { scroll-behavior: smooth; }
 body { @apply min-h-screen bg-slate-100 text-slate-950 antialiased; }
 a { @apply transition-colors; }
+
+
+body { padding-bottom: env(safe-area-inset-bottom); }
+summary { -webkit-tap-highlight-color: transparent; }
+@media (max-width: 639px) {
+  html { scroll-padding-top: 9.5rem; }
+}

@@ -16,7 +16,7 @@ function daysSince(iso?: string) {
   return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
 }
 
-function HeaderNav() {
+function HeaderNav({ mobile = false }: { mobile?: boolean }) {
   const links = [
     ["Home", "#top", "⌂"],
     ["Incidents", "#incidents", "▱"],
@@ -26,20 +26,44 @@ function HeaderNav() {
   ] as const;
 
   return (
-    <nav aria-label="Main navigation" className="flex flex-wrap items-center justify-center gap-1 lg:flex-nowrap lg:gap-2">
+    <nav
+      aria-label={mobile ? "Mobile navigation" : "Main navigation"}
+      className={mobile ? "grid gap-1" : "hidden items-center justify-center gap-1 lg:flex xl:gap-2"}
+    >
       {links.map(([label, href, icon], index) => (
         <a
           key={label}
           href={href}
-          className={`rounded-md px-2.5 py-2 text-xs font-bold transition hover:bg-white/10 hover:text-amber-300 sm:px-3 sm:text-sm ${
-            index === 0 ? "text-white lg:border-b-2 lg:border-amber-400" : "text-slate-200"
-          }`}
+          className={
+            mobile
+              ? "rounded-lg px-3 py-2.5 text-sm font-bold text-slate-100 hover:bg-white/10 hover:text-amber-300"
+              : `rounded-md px-2.5 py-2 text-xs font-bold transition hover:bg-white/10 hover:text-amber-300 xl:px-3 xl:text-sm ${
+                  index === 0 ? "border-b-2 border-amber-400 text-white" : "text-slate-200"
+                }`
+          }
         >
           <span aria-hidden="true" className="mr-1.5 text-amber-400">{icon}</span>
           {label}
         </a>
       ))}
     </nav>
+  );
+}
+
+function MobileMenu() {
+  return (
+    <details className="relative lg:hidden">
+      <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-sky-400/60 bg-sky-400/5 text-xl text-sky-200 marker:hidden [&::-webkit-details-marker]:hidden">
+        <span aria-hidden="true">☰</span>
+        <span className="sr-only">Open navigation</span>
+      </summary>
+      <div className="absolute right-0 z-50 mt-2 w-48 rounded-2xl border border-white/10 bg-[#071124] p-2 shadow-2xl">
+        <HeaderNav mobile />
+        <Link href="/admin" className="mt-1 block rounded-lg px-3 py-2.5 text-sm font-bold text-sky-200 hover:bg-sky-400/10">
+          <span aria-hidden="true" className="mr-1.5">🔒</span>Admin access
+        </Link>
+      </div>
+    </details>
   );
 }
 
@@ -79,35 +103,44 @@ export default async function HomePage() {
 
   return (
     <main id="top" className="min-h-screen bg-[#020817] text-white">
-      <header className="border-b border-white/5 bg-[#020817]">
-        <div className="mx-auto max-w-[1400px] px-4 py-4 sm:px-5">
-          <div className="grid gap-4 xl:grid-cols-[minmax(360px,1fr)_auto_auto] xl:items-center">
-            <div className="flex min-w-0 items-center gap-3">
+      <header className="sticky top-0 z-40 border-b border-white/5 bg-[#020817]/95 pt-[env(safe-area-inset-top)] backdrop-blur lg:static lg:bg-[#020817] lg:pt-0">
+        <div className="mx-auto max-w-[1400px] px-3 py-3 sm:px-5 sm:py-4">
+          <div className="grid gap-3 lg:grid-cols-[minmax(330px,1fr)_auto_auto] lg:items-center">
+            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
               <Image
                 src="/clearance-sign.svg"
                 alt="12 foot 4 inch clearance sign"
                 width={78}
                 height={78}
-                className="h-16 w-16 shrink-0 sm:h-[76px] sm:w-[76px]"
+                className="h-14 w-14 shrink-0 sm:h-[68px] sm:w-[68px] xl:h-[76px] xl:w-[76px]"
                 priority
               />
-              <div className="min-w-0">
-                <p className="truncate text-xl font-black tracking-wide sm:text-2xl">PEACE STREET BRIDGE TRACKER</p>
-                <p className="text-xs font-black uppercase tracking-[.17em] text-amber-400 sm:text-sm">Raleigh, North Carolina</p>
+              <div className="min-w-0 flex-1">
+                <p className="max-w-[16rem] text-[1.05rem] font-black leading-[1.05] tracking-wide text-white sm:max-w-none sm:text-xl lg:text-2xl">
+                  PEACE STREET BRIDGE TRACKER
+                </p>
+                <p className="mt-1 text-[0.66rem] font-black uppercase leading-tight tracking-[.14em] text-amber-400 sm:text-xs lg:text-sm">
+                  Raleigh, North Carolina
+                </p>
               </div>
             </div>
 
             <HeaderNav />
 
-            <div className="flex flex-wrap items-center justify-center gap-2 xl:justify-end">
+            <div className="hidden items-center justify-end gap-2 lg:flex">
               <NotificationButton />
               <Link
                 href="/admin"
-                className="rounded-xl border border-sky-400/70 bg-sky-400/5 px-4 py-3 text-xs font-bold text-sky-200 transition hover:bg-sky-400/15 sm:text-sm"
+                className="rounded-xl border border-sky-400/70 bg-sky-400/5 px-4 py-3 text-xs font-bold text-sky-200 transition hover:bg-sky-400/15 xl:text-sm"
               >
                 <span aria-hidden="true" className="mr-1.5">🔒</span>
                 Admin access
               </Link>
+            </div>
+
+            <div className="flex items-start justify-between gap-2 lg:hidden">
+              <div className="min-w-0 flex-1"><NotificationButton /></div>
+              <MobileMenu />
             </div>
           </div>
         </div>
@@ -115,24 +148,25 @@ export default async function HomePage() {
 
       <section className="bg-[#020817]">
         <div className="mx-auto max-w-[1400px] px-4 pb-4 sm:px-5">
-          <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-slate-900 shadow-2xl">
+          <div className="relative overflow-hidden rounded-[20px] border border-white/10 bg-slate-900 shadow-2xl sm:rounded-[26px]">
             <Image
               src="/peace-street-can-opener-hero.png"
-              alt="Raleigh's Peace Street railroad bridge with 12 foot 4 inch clearance and an opened sardine can beneath the bridge"
+              alt="Raleigh's Peace Street railroad bridge with 12 foot 4 inch clearance, an opened sardine can, and an acorn beneath the bridge"
               width={1361}
               height={692}
               priority
               className="h-auto w-full object-cover"
+              sizes="(max-width: 640px) 100vw, 1400px"
             />
             <a
               href="#incidents"
               aria-label="View all documented incidents"
-              className="absolute bottom-[4%] left-[6.5%] h-[10%] w-[27%] rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-300/80"
+              className="absolute bottom-[2%] left-[2%] h-[18%] w-[44%] rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-300/80 sm:bottom-[4%] sm:left-[6.5%] sm:h-[10%] sm:w-[27%]"
             />
           </div>
 
           <section id="stats" className="scroll-mt-24 pt-3">
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
               <Metric
                 label="Days since last strike"
                 value={String(daysSince(latest?.incident_at))}
@@ -217,10 +251,10 @@ export default async function HomePage() {
 
 function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-2xl border border-white/15 bg-[#0b1529] p-5 shadow-lg">
-      <p className="text-xs font-black uppercase tracking-[.14em] text-slate-200">{label}</p>
-      <p className="mt-2 text-4xl font-black text-amber-400">{value}</p>
-      <p className="mt-1 text-xs leading-5 text-slate-300">{detail}</p>
+    <div className="min-w-0 rounded-2xl border border-white/15 bg-[#0b1529] p-3.5 shadow-lg sm:p-5">
+      <p className="text-[0.68rem] font-black uppercase leading-4 tracking-[.1em] text-slate-200 sm:text-xs sm:tracking-[.14em]">{label}</p>
+      <p className="mt-1.5 text-3xl font-black text-amber-400 sm:mt-2 sm:text-4xl">{value}</p>
+      <p className="mt-1 text-[0.68rem] leading-4 text-slate-300 sm:text-xs sm:leading-5">{detail}</p>
     </div>
   );
 }

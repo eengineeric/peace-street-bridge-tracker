@@ -103,7 +103,7 @@ export function NotificationButton() {
             : "Enable strike alerts";
 
   return (
-    <div className="flex flex-col items-start gap-1.5">
+    <div className="flex min-w-0 flex-col items-start gap-1.5">
       <button
         type="button"
         onClick={enabled ? disable : enable}
@@ -111,14 +111,14 @@ export function NotificationButton() {
         aria-pressed={enabled}
         className={
           enabled
-            ? "rounded-xl border border-emerald-400/40 bg-emerald-400/15 px-4 py-2 text-sm font-bold text-emerald-200 hover:bg-emerald-400/20"
-            : "rounded-xl border border-amber-300/35 bg-amber-300/10 px-4 py-2 text-sm font-bold text-amber-200 hover:bg-amber-300/15 disabled:cursor-wait disabled:opacity-70"
+            ? "max-w-full rounded-xl border border-emerald-400/40 bg-emerald-400/15 px-3 py-2 text-xs font-bold leading-4 text-emerald-200 hover:bg-emerald-400/20 sm:px-4 sm:text-sm"
+            : "max-w-full rounded-xl border border-amber-300/35 bg-amber-300/10 px-3 py-2 text-xs font-bold leading-4 text-amber-200 hover:bg-amber-300/15 disabled:cursor-wait disabled:opacity-70 sm:px-4 sm:text-sm"
         }
       >
         <span aria-hidden="true" className="mr-2">🔔</span>
         {label}
       </button>
-      {errorMessage ? <span className="max-w-xs text-xs text-rose-300">{errorMessage}</span> : null}
+      {errorMessage ? <span className="max-w-[18rem] text-[0.68rem] leading-4 text-rose-300 sm:max-w-xs sm:text-xs">{errorMessage}</span> : null}
     </div>
   );
 }
