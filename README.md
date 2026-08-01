@@ -207,3 +207,8 @@ The strike-alert button now has explicit checking, enabling, enabled, and retry 
 - Uses the approved uphill Peace Street bridge hero with the peeled sardine can and acorn in front.
 - Keeps only the real functional navigation row; no navigation controls are baked into the hero artwork.
 - Retains the sardine-can + acorn PWA/home-screen icon.
+
+
+## Version 2.5.10
+
+The installed mobile app now renders a full-width strike-alert control directly beneath the mobile header. The service-worker cache version was also bumped so existing PWA installs pick up the new interface on update.
