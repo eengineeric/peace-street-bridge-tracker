@@ -181,3 +181,10 @@ Incident cards support an `image_url` field. When an archived incident photo is 
 ## v2.5.2 notification UX fix
 
 The strike-alert button now has explicit checking, enabling, enabled, and retry states. The companion SQL patch adds the `user_agent` field expected by the push-subscription API when an earlier manually-created `push_subscriptions` table omitted it.
+
+## Version 2.5.4 visual refresh
+- Approved uphill bridge hero with peeled sardine can illustration.
+- 12'4" clearance badge moved beside the primary tracker title.
+- Removed duplicate/nonfunctional homepage navigation tabs.
+- Uppercase hero headline retained in the artwork.
+- Improved `/admin` contrast for password dots, scan controls, and test-notification controls.
