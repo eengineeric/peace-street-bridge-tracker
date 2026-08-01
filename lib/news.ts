@@ -1,5 +1,6 @@
 import { recordSkippedReport, registerAutomaticReport } from "@/lib/reports";
 import { ScanResult, StructuredIncidentFields } from "@/lib/types";
+import { sendStrikePush } from "@/lib/push";
 
 const TIME_ZONE = "America/New_York";
 const MIN_CONFIDENCE = 0.82;
@@ -229,11 +230,28 @@ async function fetchArticleText(url: string) {
   }
 }
 
+function relevanceScore(item: { title: string; source: string; sourceKind: "news" | "reddit"; description: string; published: Date }) {
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  let score = 0;
+  if (text.includes("peace street bridge")) score += 8;
+  if (text.includes("peace street peeler") || text.includes("can opener")) score += 3;
+  if (/\b(struck|hit|crash|collision|stuck|wedged|lodged)\b/.test(text)) score += 5;
+  if (/\b(truck|tractor-trailer|semi|18-wheeler|box truck)\b/.test(text)) score += 4;
+  if (/wral|abc11|news & observer|raleigh police/i.test(item.source)) score += 4;
+  if (item.sourceKind === "reddit") score += 1;
+  const ageHours = Math.max(0, (Date.now() - item.published.getTime()) / 3_600_000);
+  score += Math.max(0, 5 - ageHours / 24);
+  return score;
+}
+
 export async function scanNews(): Promise<ScanResult> {
   const queries = [
     '"Peace Street" bridge Raleigh truck',
     '"Peace Street bridge" struck Raleigh',
     '"Peace Street bridge" crash Raleigh',
+    '"Peace Street bridge" stuck Raleigh',
+    '"Peace Street Peeler" truck',
+    '"Peace Street" Raleigh tractor trailer bridge',
   ];
   const itemsByUrl = new Map<string, { title: string; link: string; source: string; sourceKind: "news" | "reddit"; description: string; published: Date }>();
   const errors: string[] = [];
@@ -282,7 +300,11 @@ export async function scanNews(): Promise<ScanResult> {
   let duplicates = 0;
   let skipped = 0;
 
-  for (const item of [...itemsByUrl.values()].slice(0, 45)) {
+  const rankedItems = [...itemsByUrl.values()].sort((a, b) => relevanceScore(b) - relevanceScore(a));
+
+  let notificationsSent = 0;
+
+  for (const item of rankedItems.slice(0, 80)) {
     const summaryText = `${item.title}. ${item.description}`;
     if (!isRelevant(summaryText)) continue;
     relevant += 1;
@@ -333,13 +355,27 @@ export async function scanNews(): Promise<ScanResult> {
       });
       if (!result.duplicate_source) {
         accepted += 1;
-        if (result.created_incident) newIncidents += 1;
-        else duplicates += 1;
+        if (result.created_incident) {
+          newIncidents += 1;
+          try {
+            const push = await sendStrikePush({
+              incidentId: result.incident_id,
+              incidentAt: extraction.incidentAt,
+              title: item.title,
+              truckType: fields.truckType,
+            });
+            notificationsSent += push.sent;
+          } catch (pushError) {
+            errors.push(pushError instanceof Error ? `Push: ${pushError.message}` : "Push notification failed");
+          }
+        } else {
+          duplicates += 1;
+        }
       }
     } catch (error) {
       errors.push(error instanceof Error ? error.message : "Unknown registration error");
     }
   }
 
-  return { found: itemsByUrl.size, relevant, accepted, newIncidents, duplicates, skipped, newsItems, redditItems, errors };
+  return { found: itemsByUrl.size, relevant, accepted, newIncidents, duplicates, skipped, notificationsSent, newsItems, redditItems, errors };
 }

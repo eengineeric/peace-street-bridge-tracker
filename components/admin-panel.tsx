@@ -25,7 +25,7 @@ export function AdminPanel() {
     const data = (await response.json()) as ScanResult & { error?: string };
     setBusy(false);
     if (!response.ok) return setMessage(data.error ?? "Scan failed.");
-    setMessage(`Scan complete: ${data.newIncidents} new incident(s), ${data.duplicates} duplicate article(s), ${data.skipped} skipped.`);
+    setMessage(`Scan complete: ${data.newIncidents} new incident(s), ${data.duplicates} duplicate article(s), ${data.skipped} skipped, ${data.notificationsSent} push notification(s) sent.`);
     await loadReports();
   }
 

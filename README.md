@@ -128,3 +128,48 @@ Each incident can display:
 - all supporting news, Reddit, social, and video sources
 
 The migration also imports dated historical incidents found in public archives. This is a best-effort public-source backfill, not an official complete police ledger. Some older incidents are documented without an exact time; those entries use noon or a reasonable approximate time and remain grouped by calendar date.
+
+## Version 2.4: push alerts + multiple same-day strikes
+
+Run `supabase/v2.4-push-multistrike-official-stats.sql` after the earlier migrations.
+
+### Multiple same-day strikes
+
+The app no longer treats an entire calendar day as one incident. A new report is matched to an existing same-day event when its extracted strike time is within 60 minutes. For reports with less precise timestamps, a secondary conservative rule can merge reports within four hours only when both the specific truck type and travel direction match. Otherwise the report creates a new incident, allowing two or more genuine strikes on the same day.
+
+### Phone push notifications
+
+The installed PWA can subscribe to Web Push. Add these Vercel environment variables and redeploy:
+
+- `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
+- `VAPID_PRIVATE_KEY`
+- `VAPID_SUBJECT` (for example `mailto:you@example.com`)
+
+The homepage then shows **Enable strike alerts**. A push is sent only when the scanner creates a distinct new incident; duplicate articles do not trigger another alert.
+
+### RPD historical-count reconciliation
+
+Version 2.4 stores the July 24, 2026 WRAL report that Raleigh Police said the bridge had 13 crashes in the prior five years. The public all-time counter uses this as a lower bound for that window while keeping separately documented incidents before and after it. It does not invent dates for the RPD crashes that have not been individually identified in public sources.
+
+The v2.4 historical audit also adds exact-date WRAL incidents from April 12, 2013, July 25, 2018, and June 7, 2019 that were missing from the prior seed list.
+
+### Faster alert checks with GitHub Actions
+
+Vercel Hobby cron is kept as a once-daily fallback. Version 2.4 also includes `.github/workflows/scan.yml`, which can call the production scanner every 15 minutes.
+
+In GitHub, open **Settings → Secrets and variables → Actions** and create these repository secrets:
+
+- `TRACKER_URL` = your production URL, e.g. `https://peace-street-bridge-tracker.vercel.app`
+- `CRON_SECRET` = exactly the same `CRON_SECRET` value already configured in Vercel
+
+After those secrets exist, the scheduled workflow checks for new reports roughly every 15 minutes. Notification timing still depends on how quickly a news outlet or Reddit post appears.
+
+## Version 2.5: lifetime archive + photo-led website
+
+Run `supabase/v2.5-lifetime-gallery.sql` after v2.4.
+
+Version 2.5 redesigns the public tracker around a photo-led historical archive. It adds a sardine-can hero illustration, a bridge-history section beginning with the current bridge's reported 1954 construction, and detailed cards for every individually documented incident in the database.
+
+The historical archive distinguishes exact dates from month/year/approximate records and labels the strength of the evidence. It intentionally does not invent dates for crashes that are known only through an aggregate police count. WRAL identifies the current bridge as built in 1954, while ABC11 has reported that its investigations found Peace Street bridge crashes going back at least to the 1960s. A separately circulated historical/community photograph documents a 1956 strike; because early searchable archives are incomplete, the site presents the lifetime total as the best-supported public record rather than a guaranteed complete police ledger.
+
+Incident cards support an `image_url` field. When an archived incident photo is available it can be shown directly; otherwise the UI clearly displays a bridge placeholder and links to the supporting source rather than presenting an unrelated photo as evidence.

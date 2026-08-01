@@ -1,4 +1,4 @@
-import { BridgeIncident, BridgeReport } from "@/lib/types";
+import { BridgeIncident, BridgeReport, BridgeMilestone, OfficialBridgeStat } from "@/lib/types";
 import { isSupabaseConfigured, requireServerConfig } from "@/lib/config";
 
 async function supabaseRequest<T>(path: string, init?: RequestInit): Promise<T> {
@@ -43,6 +43,18 @@ export async function getIncidents(limit = 100): Promise<BridgeIncident[]> {
   });
 }
 
+export async function getMilestones(): Promise<BridgeMilestone[]> {
+  if (!isSupabaseConfigured) return [];
+  return supabaseRequest<BridgeMilestone[]>(`bridge_history_milestones?select=*&order=milestone_date.asc`);
+}
+
+export async function getOfficialStats(): Promise<OfficialBridgeStat[]> {
+  if (!isSupabaseConfigured) return [];
+  return supabaseRequest<OfficialBridgeStat[]>(
+    `bridge_official_stats?select=*&order=window_end.desc`,
+  );
+}
+
 export async function getReports(limit = 100): Promise<BridgeReport[]> {
   if (!isSupabaseConfigured) return [];
   return supabaseRequest<BridgeReport[]>(
@@ -72,6 +84,7 @@ export type RegisterReportResult = {
   incident_id: string;
   created_incident: boolean;
   duplicate_source: boolean;
+  match_reason?: string;
 };
 
 export async function registerAutomaticReport(

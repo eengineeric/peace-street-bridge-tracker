@@ -11,6 +11,12 @@ export type BridgeIncident = {
   truck_type: string | null;
   damage_summary: string | null;
   injury_summary: string | null;
+  notification_sent_at?: string | null;
+  match_notes?: string | null;
+  date_precision?: "exact" | "day" | "month" | "year" | "approximate";
+  evidence_level?: "primary" | "secondary" | "community" | "official-aggregate";
+  historical_notes?: string | null;
+  image_url?: string | null;
   created_at: string;
   updated_at: string;
   source_count?: number;
@@ -36,9 +42,30 @@ export type BridgeReport = {
   truck_type: string | null;
   damage_summary: string | null;
   injury_summary: string | null;
+  image_url?: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type OfficialBridgeStat = {
+  id: string;
+  source_name: string;
+  source_url: string;
+  window_start: string;
+  window_end: string;
+  crash_count: number;
+  notes: string | null;
+};
+
+export type BridgeMilestone = {
+  id: string;
+  milestone_date: string;
+  title: string;
+  details: string;
+  source_name: string | null;
+  source_url: string | null;
+  image_url: string | null;
 };
 
 export type StructuredIncidentFields = {
@@ -56,6 +83,7 @@ export type ScanResult = {
   newIncidents: number;
   duplicates: number;
   skipped: number;
+  notificationsSent: number;
   newsItems: number;
   redditItems: number;
   errors: string[];
