@@ -1,5 +1,5 @@
 import { recordSkippedReport, registerAutomaticReport } from "@/lib/reports";
-import { ScanResult } from "@/lib/types";
+import { ScanResult, StructuredIncidentFields } from "@/lib/types";
 
 const TIME_ZONE = "America/New_York";
 const MIN_CONFIDENCE = 0.82;
@@ -170,6 +170,48 @@ function extractIncidentDateTime(text: string, published: Date): Extraction | nu
   return null;
 }
 
+
+function extractStructuredFields(text: string): StructuredIncidentFields {
+  const normalized = text.replace(/\s+/g, " ");
+  const lower = normalized.toLowerCase();
+  const location = /(?:peace street (?:railroad )?bridge|bridge (?:over|at|near) peace street|peace and (?:north )?west streets|peace street at mcclure drive)/i.test(normalized)
+    ? "Peace Street railroad bridge, Raleigh, NC"
+    : "Peace Street bridge, Raleigh, NC";
+
+  const directionMatch = normalized.match(/\b(eastbound|westbound|northbound|southbound)\b/i);
+  const truckPatterns = [
+    /\btractor[- ]trailer\b/i, /\b18[- ]wheeler\b/i, /\bbox truck\b/i,
+    /\bdump truck\b/i, /\bbeer truck\b/i, /\bsemi(?:-truck)?\b/i, /\bmoving truck\b/i, /\blarge truck\b/i, /\btruck\b/i,
+  ];
+  const truck = truckPatterns.map((pattern) => normalized.match(pattern)?.[0]).find(Boolean) ?? null;
+
+  let damageSummary: string | null = null;
+  if (/roof[^.]{0,80}(?:ripped|peeled|torn|sheared|removed)/i.test(normalized) || /(?:ripped|peeled|torn|sheared)[^.]{0,80}roof/i.test(normalized)) {
+    damageSummary = "Truck roof was ripped, peeled, torn, or sheared.";
+  } else if (/minor damage/i.test(normalized)) {
+    damageSummary = "Minor vehicle damage reported.";
+  } else if (/no (?:visible )?damage (?:to )?(?:the )?bridge/i.test(normalized)) {
+    damageSummary = "No visible bridge damage reported.";
+  } else if (/stuck|wedged|lodged/i.test(normalized)) {
+    damageSummary = "Vehicle became stuck or wedged beneath the bridge.";
+  }
+
+  let injurySummary: string | null = null;
+  if (/no injuries|no one was injured|nobody was injured/i.test(lower)) injurySummary = "No injuries reported.";
+  else if (/injur(?:y|ies|ed)/i.test(normalized)) injurySummary = "Injuries were mentioned; see sources for details.";
+
+  return {
+    location,
+    travelDirection: directionMatch?.[1]?.toLowerCase() ?? null,
+    truckType: truck ? truck.toLowerCase() : null,
+    damageSummary,
+    injurySummary,
+  };
+}
+
+function getAtomLink(block: string) {
+  return block.match(/<link[^>]+href=["']([^"']+)["']/i)?.[1] ?? "";
+}
 async function fetchArticleText(url: string) {
   try {
     const response = await fetch(url, {
@@ -193,7 +235,7 @@ export async function scanNews(): Promise<ScanResult> {
     '"Peace Street bridge" struck Raleigh',
     '"Peace Street bridge" crash Raleigh',
   ];
-  const itemsByUrl = new Map<string, { title: string; link: string; source: string; description: string; published: Date }>();
+  const itemsByUrl = new Map<string, { title: string; link: string; source: string; sourceKind: "news" | "reddit"; description: string; published: Date }>();
   const errors: string[] = [];
 
   for (const query of queries) {
@@ -208,12 +250,31 @@ export async function scanNews(): Promise<ScanResult> {
         const source = decodeXml(getTag(block, "source")) || "Google News";
         const description = stripHtml(getTag(block, "description"));
         const published = new Date(getTag(block, "pubDate") || Date.now());
-        if (link) itemsByUrl.set(link, { title, link, source, description, published });
+        if (link) itemsByUrl.set(link, { title, link, source, sourceKind: "news", description, published });
       }
     } catch (error) {
       errors.push(error instanceof Error ? error.message : "Unknown feed error");
     }
   }
+
+  try {
+    const redditUrl = "https://www.reddit.com/r/raleigh/search.rss?q=" + encodeURIComponent('"Peace Street" bridge truck OR stuck OR struck') + "&restrict_sr=on&sort=new&t=all";
+    const response = await fetch(redditUrl, { headers: { "User-Agent": "PeaceStreetBridgeTracker/2.3 (public incident monitor)" }, cache: "no-store" });
+    if (!response.ok) throw new Error(`Reddit feed returned HTTP ${response.status}`);
+    const xml = await response.text();
+    for (const block of [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/gi)].map((match) => match[1]).slice(0, 35)) {
+      const title = decodeXml(getTag(block, "title"));
+      const link = decodeXml(getAtomLink(block));
+      const description = stripHtml(getTag(block, "content"));
+      const published = new Date(getTag(block, "published") || getTag(block, "updated") || Date.now());
+      if (link) itemsByUrl.set(link, { title, link, source: "r/raleigh", sourceKind: "reddit", description, published });
+    }
+  } catch (error) {
+    errors.push(error instanceof Error ? error.message : "Unknown Reddit feed error");
+  }
+
+  const newsItems = [...itemsByUrl.values()].filter((item) => item.sourceKind === "news").length;
+  const redditItems = [...itemsByUrl.values()].filter((item) => item.sourceKind === "reddit").length;
 
   let relevant = 0;
   let accepted = 0;
@@ -230,7 +291,15 @@ export async function scanNews(): Promise<ScanResult> {
     const combined = `${item.title}. ${item.description}. ${articleText}`;
     if (!isRelevant(combined)) continue;
 
-    const extraction = extractIncidentDateTime(combined, item.published);
+    let extraction = extractIncidentDateTime(combined, item.published);
+    if (!extraction && item.sourceKind === "reddit") {
+      const ageHours = (Date.now() - item.published.getTime()) / 3_600_000;
+      const looksLive = /\b(just|again|right now|police|on the scene|currently|this morning|today|stuck|wedged)\b/i.test(combined)
+        && !/\b(1956|1988|throwback|history|historical|old photo|years ago)\b/i.test(combined);
+      if (ageHours >= 0 && ageHours <= 48 && looksLive) {
+        extraction = { incidentAt: item.published.toISOString(), confidence: 0.84, method: "reddit-live-post-time", excerpt: relevantSentences(combined)[0]?.slice(0, 800) ?? item.title };
+      }
+    }
     if (!extraction || extraction.confidence < MIN_CONFIDENCE) {
       skipped += 1;
       await recordSkippedReport({
@@ -245,6 +314,7 @@ export async function scanNews(): Promise<ScanResult> {
     }
 
     try {
+      const fields = extractStructuredFields(combined);
       const result = await registerAutomaticReport({
         title: item.title,
         source_url: item.link,
@@ -254,6 +324,12 @@ export async function scanNews(): Promise<ScanResult> {
         confidence: extraction.confidence,
         extraction_method: extraction.method,
         excerpt: extraction.excerpt,
+        source_kind: item.sourceKind,
+        location: fields.location,
+        travel_direction: fields.travelDirection,
+        truck_type: fields.truckType,
+        damage_summary: fields.damageSummary,
+        injury_summary: fields.injurySummary,
       });
       if (!result.duplicate_source) {
         accepted += 1;
@@ -265,5 +341,5 @@ export async function scanNews(): Promise<ScanResult> {
     }
   }
 
-  return { found: itemsByUrl.size, relevant, accepted, newIncidents, duplicates, skipped, errors };
+  return { found: itemsByUrl.size, relevant, accepted, newIncidents, duplicates, skipped, newsItems, redditItems, errors };
 }

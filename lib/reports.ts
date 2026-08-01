@@ -59,6 +59,12 @@ export type RegisterReportInput = {
   confidence: number;
   extraction_method: string;
   excerpt: string;
+  source_kind: string;
+  location: string | null;
+  travel_direction: string | null;
+  truck_type: string | null;
+  damage_summary: string | null;
+  injury_summary: string | null;
 };
 
 export type RegisterReportResult = {
@@ -88,6 +94,12 @@ export async function registerAutomaticReport(
       p_confidence: input.confidence,
       p_extraction_method: input.extraction_method,
       p_excerpt: input.excerpt,
+      p_source_kind: input.source_kind,
+      p_location: input.location,
+      p_travel_direction: input.travel_direction,
+      p_truck_type: input.truck_type,
+      p_damage_summary: input.damage_summary,
+      p_injury_summary: input.injury_summary,
     }),
     cache: "no-store",
   });

@@ -110,3 +110,21 @@ This release is a Progressive Web App (PWA), so it can be installed from the dep
 4. Confirm the installation.
 
 The installed app launches in its own window and keeps a cached copy of the most recently loaded dashboard for limited offline viewing. Live incident updates still require an internet connection.
+
+## Version 2.3: structured fields, Reddit alerts, historical backfill
+
+Run `supabase/v2.3-structured-reddit-history.sql` once in the Supabase SQL Editor before deploying this code update.
+
+The scanner now checks both Google News RSS and the r/raleigh Reddit search feed. Reddit is treated as an alert source: a post is auto-counted only when it strongly references the Peace Street bridge and a truck strike, appears to be a live/current report, is less than 48 hours old, and is not marked as historical or a throwback. Same-day sources are grouped into one counted incident.
+
+Each incident can display:
+
+- strike date and approximate time
+- bridge location
+- direction of travel, when stated
+- truck type
+- damage summary
+- injury summary
+- all supporting news, Reddit, social, and video sources
+
+The migration also imports dated historical incidents found in public archives. This is a best-effort public-source backfill, not an official complete police ledger. Some older incidents are documented without an exact time; those entries use noon or a reasonable approximate time and remain grouped by calendar date.
