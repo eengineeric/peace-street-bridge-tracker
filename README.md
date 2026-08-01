@@ -1,3 +1,7 @@
+# Version 2.5.1 visual update
+
+This patch replaces the homepage hero with the preferred 12 ft 4 in clearance artwork and removes duplicate live overlay text from the hero.
+
 # Peace Street Bridge Tracker — Automatic Version
 
 A Next.js application that automatically detects truck strikes at Raleigh's Peace Street railroad bridge, extracts the reported incident date and time, and counts no more than one incident on each Raleigh calendar day.

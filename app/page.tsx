@@ -40,16 +40,20 @@ export default async function HomePage() {
 
     <section className="bg-slate-950 text-white">
       <div className="mx-auto grid max-w-7xl gap-4 px-4 py-5 sm:px-6 lg:grid-cols-[1.65fr_.75fr]">
-        <div className="relative min-h-[390px] overflow-hidden rounded-3xl border border-white/10">
-          <Image src="/peace-street-can-opener-hero.png" alt="Peace Street railroad bridge with an opened sardine can beneath it" fill priority className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/25 to-transparent" />
-          <div className="absolute right-3 top-3 rounded-lg bg-slate-950/85 px-3 py-2 text-[11px] font-bold text-white">Stylized illustration · actual posted clearance: 12 ft 4 in</div>
-          <div className="absolute inset-x-0 bottom-0 p-7 sm:p-10">
-            <p className="text-sm font-black uppercase tracking-[.2em] text-amber-400">Raleigh&apos;s can opener</p>
-            <h1 className="mt-2 max-w-2xl text-4xl font-black sm:text-6xl">The Peace Street railroad bridge</h1>
-            <p className="mt-3 max-w-xl text-slate-200">Tracking documented truck strikes, current alerts, and the bridge&apos;s history from its 1954 construction to today.</p>
-            <a href="#incidents" className="mt-5 inline-flex rounded-xl bg-amber-400 px-5 py-3 font-black text-slate-950 hover:bg-amber-300">View all documented incidents</a>
-          </div>
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900">
+          <Image
+            src="/peace-street-can-opener-hero.png"
+            alt="Stylized Peace Street Bridge Tracker hero showing the 12 foot 4 inch clearance and an opened sardine can beneath the bridge"
+            width={1536}
+            height={1024}
+            priority
+            className="h-auto w-full object-cover"
+          />
+          <a
+            href="#incidents"
+            aria-label="View all documented incidents"
+            className="absolute bottom-[7%] left-[7%] h-[8%] w-[33%] rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-300/80"
+          />
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
