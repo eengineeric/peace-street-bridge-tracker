@@ -19,31 +19,26 @@ function daysSince(iso?: string) {
 function HeaderNav() {
   const links = [
     ["Home", "#top", "⌂"],
-    ["Incidents", "#incidents", "▣"],
+    ["Incidents", "#incidents", "▱"],
     ["Stats", "#stats", "▥"],
     ["Gallery", "#gallery", "▧"],
     ["About", "#history", "ⓘ"],
   ] as const;
 
   return (
-    <nav aria-label="Main navigation" className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
-      {links.map(([label, href, icon]) => (
+    <nav aria-label="Main navigation" className="flex flex-wrap items-center justify-center gap-1 lg:flex-nowrap lg:gap-2">
+      {links.map(([label, href, icon], index) => (
         <a
           key={label}
           href={href}
-          className="rounded-lg px-2.5 py-2 text-xs font-bold text-slate-200 hover:bg-white/10 hover:text-amber-300 sm:px-3 sm:text-sm"
+          className={`rounded-md px-2.5 py-2 text-xs font-bold transition hover:bg-white/10 hover:text-amber-300 sm:px-3 sm:text-sm ${
+            index === 0 ? "text-white lg:border-b-2 lg:border-amber-400" : "text-slate-200"
+          }`}
         >
           <span aria-hidden="true" className="mr-1.5 text-amber-400">{icon}</span>
           {label}
         </a>
       ))}
-      <Link
-        href="/admin"
-        className="rounded-lg border border-sky-400/60 bg-sky-400/10 px-3 py-2 text-xs font-bold text-sky-200 hover:bg-sky-400/20 sm:text-sm"
-      >
-        <span aria-hidden="true" className="mr-1.5">🔒</span>
-        Admin access
-      </Link>
     </nav>
   );
 }
@@ -54,6 +49,7 @@ export default async function HomePage() {
     getOfficialStats(),
     getMilestones(),
   ]);
+
   const year = new Date().getFullYear();
   const thisYear = incidents.filter((i) => localDate(i.incident_at).startsWith(String(year))).length;
   const latest = incidents[0];
@@ -82,54 +78,60 @@ export default async function HomePage() {
   }
 
   return (
-    <main id="top" className="min-h-screen bg-slate-950 text-white">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/95 backdrop-blur">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                <Image
-                  src="/clearance-sign.svg"
-                  alt="12 foot 4 inch clearance sign"
-                  width={76}
-                  height={76}
-                  className="h-14 w-14 shrink-0 sm:h-[72px] sm:w-[72px]"
-                  priority
-                />
-                <div className="min-w-0">
-                  <p className="truncate text-lg font-black tracking-wide sm:text-2xl">PEACE STREET BRIDGE TRACKER</p>
-                  <p className="text-xs font-black uppercase tracking-[.17em] text-amber-400 sm:text-sm">Raleigh, North Carolina</p>
-                </div>
+    <main id="top" className="min-h-screen bg-[#020817] text-white">
+      <header className="border-b border-white/5 bg-[#020817]">
+        <div className="mx-auto max-w-[1400px] px-4 py-4 sm:px-5">
+          <div className="grid gap-4 xl:grid-cols-[minmax(360px,1fr)_auto_auto] xl:items-center">
+            <div className="flex min-w-0 items-center gap-3">
+              <Image
+                src="/clearance-sign.svg"
+                alt="12 foot 4 inch clearance sign"
+                width={78}
+                height={78}
+                className="h-16 w-16 shrink-0 sm:h-[76px] sm:w-[76px]"
+                priority
+              />
+              <div className="min-w-0">
+                <p className="truncate text-xl font-black tracking-wide sm:text-2xl">PEACE STREET BRIDGE TRACKER</p>
+                <p className="text-xs font-black uppercase tracking-[.17em] text-amber-400 sm:text-sm">Raleigh, North Carolina</p>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
-              <HeaderNav />
+            <HeaderNav />
+
+            <div className="flex flex-wrap items-center justify-center gap-2 xl:justify-end">
               <NotificationButton />
+              <Link
+                href="/admin"
+                className="rounded-xl border border-sky-400/70 bg-sky-400/5 px-4 py-3 text-xs font-bold text-sky-200 transition hover:bg-sky-400/15 sm:text-sm"
+              >
+                <span aria-hidden="true" className="mr-1.5">🔒</span>
+                Admin access
+              </Link>
             </div>
           </div>
         </div>
       </header>
 
-      <section className="bg-slate-950">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl">
+      <section className="bg-[#020817]">
+        <div className="mx-auto max-w-[1400px] px-4 pb-4 sm:px-5">
+          <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-slate-900 shadow-2xl">
             <Image
               src="/peace-street-can-opener-hero.png"
-              alt="Illustration of Raleigh's Peace Street railroad bridge with 12 foot 4 inch clearance and an opened sardine can beneath the bridge"
-              width={1339}
-              height={705}
+              alt="Raleigh's Peace Street railroad bridge with 12 foot 4 inch clearance and an opened sardine can beneath the bridge"
+              width={1361}
+              height={692}
               priority
               className="h-auto w-full object-cover"
             />
             <a
               href="#incidents"
               aria-label="View all documented incidents"
-              className="absolute bottom-[3.5%] left-[2.3%] h-[10%] w-[29%] rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-300/80"
+              className="absolute bottom-[4%] left-[6.5%] h-[10%] w-[27%] rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-300/80"
             />
           </div>
 
-          <section id="stats" className="scroll-mt-32 pt-4">
+          <section id="stats" className="scroll-mt-24 pt-3">
             <div className="grid gap-3 sm:grid-cols-2">
               <Metric
                 label="Days since last strike"
@@ -152,12 +154,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl space-y-6 px-4 py-7 text-slate-950 sm:px-6">
+      <div className="mx-auto max-w-[1400px] space-y-6 px-4 py-7 text-slate-950 sm:px-5">
         {!isSupabaseConfigured && (
           <div className="rounded-2xl bg-amber-100 p-4 text-amber-900">Demo mode: connect Supabase to load live and historical data.</div>
         )}
 
-        <section id="gallery" className="scroll-mt-32 rounded-3xl bg-white p-5 shadow-xl sm:p-7">
+        <section id="gallery" className="scroll-mt-28 rounded-3xl bg-white p-5 shadow-xl sm:p-7">
           <div className="flex flex-col gap-2 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-600">Photo gallery</p>
@@ -183,11 +185,11 @@ export default async function HomePage() {
           )}
         </section>
 
-        <section id="history" className="grid scroll-mt-32 gap-5 lg:grid-cols-[1fr_1.4fr]">
+        <section id="history" className="grid scroll-mt-28 gap-5 lg:grid-cols-[1fr_1.4fr]">
           <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-xl">
             <p className="text-xs font-black uppercase tracking-[.18em] text-amber-400">About the bridge</p>
             <h2 className="mt-2 text-3xl font-black">Built in 1954</h2>
-            <p className="mt-3 leading-7 text-slate-300">Public WRAL reporting identifies the current Peace Street railroad bridge as a 1954 structure with 12 ft 4 in clearance. The tracker starts its historical coverage at construction and distinguishes individually documented strikes from official aggregate crash counts.</p>
+            <p className="mt-3 leading-7 text-slate-300">Public reporting identifies the current Peace Street railroad bridge as a 1954 structure with 12 ft 4 in clearance. The tracker starts its historical coverage at construction and distinguishes individually documented strikes from official aggregate crash counts.</p>
             <p className="mt-4 text-sm text-slate-400">Historical gaps are shown honestly: an aggregate police count can raise the all-time minimum without inventing dates or photos for incidents that are not individually documented.</p>
           </div>
           <div className="rounded-3xl bg-white p-6 shadow-xl">
@@ -215,10 +217,10 @@ export default async function HomePage() {
 
 function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-2xl border border-white/15 bg-slate-900 p-5 shadow-lg">
-      <p className="text-xs font-black uppercase tracking-[.14em] text-slate-300">{label}</p>
+    <div className="rounded-2xl border border-white/15 bg-[#0b1529] p-5 shadow-lg">
+      <p className="text-xs font-black uppercase tracking-[.14em] text-slate-200">{label}</p>
       <p className="mt-2 text-4xl font-black text-amber-400">{value}</p>
-      <p className="mt-1 text-xs leading-5 text-slate-400">{detail}</p>
+      <p className="mt-1 text-xs leading-5 text-slate-300">{detail}</p>
     </div>
   );
 }
