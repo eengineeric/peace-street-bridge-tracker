@@ -198,3 +198,8 @@ The strike-alert button now has explicit checking, enabling, enabled, and retry 
 - Uses the approved uphill Peace Street bridge hero with the peeled sardine can.
 - Keeps exactly one functional navigation row; no navigation or alert controls are baked into the hero image.
 - Updates the installable phone icon to the approved bridge + sardine can + acorn artwork.
+
+## Version 2.5.8
+- Uses the approved uphill Peace Street bridge hero with the peeled sardine can and acorn in front.
+- Keeps only the real functional navigation row; no navigation controls are baked into the hero artwork.
+- Retains the sardine-can + acorn PWA/home-screen icon.
