@@ -177,3 +177,7 @@ Version 2.5 redesigns the public tracker around a photo-led historical archive. 
 The historical archive distinguishes exact dates from month/year/approximate records and labels the strength of the evidence. It intentionally does not invent dates for crashes that are known only through an aggregate police count. WRAL identifies the current bridge as built in 1954, while ABC11 has reported that its investigations found Peace Street bridge crashes going back at least to the 1960s. A separately circulated historical/community photograph documents a 1956 strike; because early searchable archives are incomplete, the site presents the lifetime total as the best-supported public record rather than a guaranteed complete police ledger.
 
 Incident cards support an `image_url` field. When an archived incident photo is available it can be shown directly; otherwise the UI clearly displays a bridge placeholder and links to the supporting source rather than presenting an unrelated photo as evidence.
+
+## v2.5.2 notification UX fix
+
+The strike-alert button now has explicit checking, enabling, enabled, and retry states. The companion SQL patch adds the `user_agent` field expected by the push-subscription API when an earlier manually-created `push_subscriptions` table omitted it.

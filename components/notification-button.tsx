@@ -9,15 +9,19 @@ function urlBase64ToUint8Array(base64String: string) {
   return Uint8Array.from([...rawData].map((character) => character.charCodeAt(0)));
 }
 
+type AlertState = "checking" | "unsupported" | "disabled" | "enabling" | "enabled" | "error";
+
 export function NotificationButton() {
-  const [state, setState] = useState<"checking" | "unsupported" | "disabled" | "enabled">("checking");
+  const [state, setState] = useState<AlertState>("checking");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
   useEffect(() => {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !publicKey) {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window) || !publicKey) {
       setState("unsupported");
       return;
     }
+
     navigator.serviceWorker.ready
       .then((registration) => registration.pushManager.getSubscription())
       .then((subscription) => setState(subscription ? "enabled" : "disabled"))
@@ -25,37 +29,96 @@ export function NotificationButton() {
   }, [publicKey]);
 
   async function enable() {
-    if (!publicKey) return;
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") return;
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
-    });
-    const response = await fetch("/api/push/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(subscription.toJSON()) });
-    if (response.ok) setState("enabled");
+    if (!publicKey || state === "enabling") return;
+    setErrorMessage(null);
+    setState("enabling");
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        setState("disabled");
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      const existing = await registration.pushManager.getSubscription();
+      const subscription =
+        existing ??
+        (await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(publicKey),
+        }));
+
+      const response = await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subscription.toJSON()),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(payload?.error || `Unable to register alerts (${response.status}).`);
+      }
+
+      setState("enabled");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to enable strike alerts.");
+      setState("error");
+    }
   }
 
   async function disable() {
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.getSubscription();
-    if (subscription) {
-      await fetch("/api/push/unsubscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: subscription.endpoint }) });
-      await subscription.unsubscribe();
+    setErrorMessage(null);
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        await fetch("/api/push/unsubscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ endpoint: subscription.endpoint }),
+        });
+        await subscription.unsubscribe();
+      }
+      setState("disabled");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to disable strike alerts.");
+      setState("error");
     }
-    setState("disabled");
   }
 
   if (state === "unsupported") return null;
+
+  const enabled = state === "enabled";
+  const busy = state === "checking" || state === "enabling";
+  const label =
+    state === "enabled"
+      ? "✓ Strike alerts enabled"
+      : state === "checking"
+        ? "Checking strike alerts…"
+        : state === "enabling"
+          ? "Enabling strike alerts…"
+          : state === "error"
+            ? "Retry strike alerts"
+            : "Enable strike alerts";
+
   return (
-    <button
-      type="button"
-      onClick={state === "enabled" ? disable : enable}
-      disabled={state === "checking"}
-      className="rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold text-sky-200 hover:bg-white/10 disabled:opacity-50"
-    >
-      {state === "enabled" ? "🔔 Strike alerts on" : state === "checking" ? "Checking alerts…" : "🔕 Enable strike alerts"}
-    </button>
+    <div className="flex flex-col items-start gap-1.5">
+      <button
+        type="button"
+        onClick={enabled ? disable : enable}
+        disabled={busy}
+        aria-pressed={enabled}
+        className={
+          enabled
+            ? "rounded-xl border border-emerald-400/40 bg-emerald-400/15 px-4 py-2 text-sm font-bold text-emerald-200 hover:bg-emerald-400/20"
+            : "rounded-xl border border-amber-300/35 bg-amber-300/10 px-4 py-2 text-sm font-bold text-amber-200 hover:bg-amber-300/15 disabled:cursor-wait disabled:opacity-70"
+        }
+      >
+        <span aria-hidden="true" className="mr-2">🔔</span>
+        {label}
+      </button>
+      {errorMessage ? <span className="max-w-xs text-xs text-rose-300">{errorMessage}</span> : null}
+    </div>
   );
 }
