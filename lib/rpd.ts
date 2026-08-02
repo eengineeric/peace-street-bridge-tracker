@@ -1,5 +1,6 @@
 import { requireServerConfig } from "@/lib/config";
 
+// v2.6.1: precise RPD timestamps are reconciled server-side using a 30-minute window.
 export type RpdImportResult = {
   total: number;
   imported: number;

@@ -230,3 +230,20 @@ Matching rules:
 
 See `docs/raleigh-police-records-request.txt` for the recommended records request and
 `docs/rpd-import-template.csv` for a sample import layout.
+
+
+## Version 2.6.1 — physical strike dedup + mobile push fix
+
+Run `supabase/v2.6.1-multistrike-mobile-push.sql`.
+
+Changes:
+- July 30, 2026 is represented as two distinct physical strikes.
+- Scanner matching uses a 10-minute unconditional event window, 30 minutes only
+  with corroborating truck/direction details, and a wider 2-hour fallback only
+  when both truck type and direction match.
+- RPD precise-time imports auto-link only within 30 minutes.
+- Mobile push capability is checked on `ServiceWorkerRegistration.pushManager`
+  rather than requiring `window.PushManager`, avoiding false "unavailable"
+  results on supported mobile PWAs.
+- iPhone browser use now explains that push alerts require adding the tracker to
+  the Home Screen rather than simply saying alerts are unavailable.

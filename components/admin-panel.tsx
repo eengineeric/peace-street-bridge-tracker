@@ -103,7 +103,7 @@ export function AdminPanel() {
         <h2 className="mt-2 text-2xl font-black">Import official crash-record CSV</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
           Upload the electronic index or spreadsheet returned by Raleigh Police. The importer keeps separate same-day strikes,
-          links timed records to an existing incident when they fall within 90 minutes, and treats unique RPD report numbers as primary evidence.
+          links timed records to an existing incident only when they fall within 30 minutes, and treats unique RPD report numbers as primary evidence.
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
           <input

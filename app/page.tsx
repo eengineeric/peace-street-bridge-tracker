@@ -142,7 +142,7 @@ export default async function HomePage() {
               <div className="flex items-center justify-end">
                 <MobileMenu />
               </div>
-              <div className="w-full rounded-2xl border border-amber-300/15 bg-amber-300/[0.04] p-2">
+              <div className="flex w-full justify-center rounded-2xl border border-amber-300/15 bg-amber-300/[0.04] px-2 py-1.5">
                 <NotificationButton prominent />
               </div>
             </div>

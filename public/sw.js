@@ -1,4 +1,4 @@
-const CACHE_NAME = "peace-street-bridge-tracker-v2510";
+const CACHE_NAME = "peace-street-bridge-tracker-v261";
 const APP_SHELL = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png"];
 
 self.addEventListener("install", (event) => {
