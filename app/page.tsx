@@ -203,7 +203,7 @@ export default async function HomePage() {
               <Metric
                 label="All-time incidents"
                 value={String(allTimeCount)}
-                detail={adjusted && stat ? `Reconciled with RPD's ${stat.crash_count}-crash lower bound for ${stat.window_start}–${stat.window_end}` : "Best-supported public record"}
+                detail="Updates to ALL-TIME INCIDENTS will be made as more historical research and verification is completed"
               />
               <Metric
                 label="Earliest documented strike found"
