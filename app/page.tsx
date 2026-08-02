@@ -97,8 +97,11 @@ export default async function HomePage() {
     getMilestones(),
   ]);
 
-  const year = new Date().getFullYear();
-  const thisYear = incidents.filter((i) => localDate(i.incident_at).startsWith(String(year))).length;
+  const year = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+  }).format(new Date());
+  const thisYear = incidents.filter((i) => i.incident_date?.startsWith(`${year}-`)).length;
   const latest = incidents[0];
   const earliest = incidents[incidents.length - 1];
   const galleryItems = incidents
@@ -270,7 +273,7 @@ export default async function HomePage() {
 
         <ReportList incidents={[...incidents].reverse()} />
 
-        <section className="rounded-3xl bg-slate-900 p-6 text-sm leading-6 text-slate-300"><strong className="text-white">Historical coverage note.</strong> The tracker searches and seeds individually supportable records going back toward the bridge&apos;s 1954 construction. It does not claim a complete lifetime police ledger where source records are unavailable. Current scanning continues to monitor news and Reddit and can add multiple distinct strikes on the same day.</section>
+        <section className="rounded-3xl bg-slate-900 p-6 text-sm leading-6 text-slate-300"><strong className="text-white">Historical coverage note.</strong> The tracker searches and seeds individually supportable records going back toward the bridge&apos;s 1954 construction. It does not claim a complete lifetime police ledger where source records are unavailable. Current scanning checks news and Reddit every 30 minutes and can add multiple distinct strikes on the same day.</section>
       </div>
       <BetaFeedback />
     </main>

@@ -284,3 +284,13 @@ Recommended beta release workflow:
 3. Open `/admin`, run one manual scan, and send one test notification.
 4. Download a database backup.
 5. Give the beta URL to friends and ask them to use the floating feedback button.
+
+## Dynamic annual strike counter
+
+The annual dashboard card now uses the current Raleigh calendar year
+(`America/New_York`) and counts incidents by `incident_date`. On January 1 it
+automatically changes from, for example, `Strikes in 2026` to `Strikes in 2027`.
+If no strikes have been recorded in the new year, it displays 0.
+
+Automatic news and Reddit scanning remains scheduled every 30 minutes, and the
+website's historical coverage note states that frequency.
