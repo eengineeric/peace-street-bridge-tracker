@@ -109,6 +109,7 @@ export async function exportDatabaseSnapshot() {
     "scan_runs",
     "beta_feedback",
     "app_error_log",
+    "community_strike_reports",
   ];
 
   const snapshot: Record<string, unknown[]> = {};

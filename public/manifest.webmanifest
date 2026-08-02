@@ -1,6 +1,6 @@
 {
-  "name": "Peace Street Bridge Tracker",
-  "short_name": "Bridge Tracker",
+  "name": "Peace Street Bridge Truck Strike Tracker",
+  "short_name": "Truck Strike Tracker",
   "description": "Automatic tracker for truck strikes at Raleigh's Peace Street railroad bridge.",
   "start_url": "/",
   "scope": "/",
@@ -8,7 +8,10 @@
   "orientation": "portrait-primary",
   "background_color": "#020617",
   "theme_color": "#020617",
-  "categories": ["news", "utilities"],
+  "categories": [
+    "news",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "/icons/icon-192.png",

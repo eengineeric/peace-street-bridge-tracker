@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { BridgeReport, ScanResult } from "@/lib/types";
+import { CommunityReportAdmin } from "@/components/community-report-admin";
 
 type OpsHealth = {
   latestRuns: Array<any>;
@@ -173,6 +174,8 @@ export function AdminPanel() {
           <p className="mt-1 text-sm text-slate-600">New tester reports awaiting review.</p>
         </div>
       </section>
+
+      <CommunityReportAdmin secret={secret} onMessage={setMessage} />
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
         <p className="text-xs font-black uppercase tracking-[.16em] text-violet-700">Incident correction tools</p>

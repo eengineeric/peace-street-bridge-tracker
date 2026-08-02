@@ -3,6 +3,10 @@ import Link from "next/link";
 import { ReportList } from "@/components/report-list";
 import { NotificationButton } from "@/components/notification-button";
 import { BetaFeedback } from "@/components/beta-feedback";
+import { MobileMenu } from "@/components/mobile-menu";
+import { TruckClearanceGraphic } from "@/components/truck-clearance-graphic";
+import { StrikePatterns } from "@/components/strike-patterns";
+import { CommunityStrikeReport } from "@/components/community-strike-report";
 import { getIncidents, getMilestones, getOfficialStats } from "@/lib/reports";
 import { isSupabaseConfigured } from "@/lib/config";
 
@@ -73,23 +77,6 @@ function HeaderNav({ mobile = false }: { mobile?: boolean }) {
   );
 }
 
-function MobileMenu() {
-  return (
-    <details className="relative lg:hidden">
-      <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-sky-400/60 bg-sky-400/5 text-xl text-sky-200 marker:hidden [&::-webkit-details-marker]:hidden">
-        <span aria-hidden="true">☰</span>
-        <span className="sr-only">Open navigation</span>
-      </summary>
-      <div className="absolute right-0 z-50 mt-2 w-48 rounded-2xl border border-white/10 bg-[#071124] p-2 shadow-2xl">
-        <HeaderNav mobile />
-        <Link href="/admin" className="mt-1 block rounded-lg px-3 py-2.5 text-sm font-bold text-sky-200 hover:bg-sky-400/10">
-          <span aria-hidden="true" className="mr-1.5">🔒</span>Admin access
-        </Link>
-      </div>
-    </details>
-  );
-}
-
 export default async function HomePage() {
   const [incidents, officialStats, milestones] = await Promise.all([
     getIncidents(1000),
@@ -143,7 +130,7 @@ export default async function HomePage() {
               />
               <div className="min-w-0 flex-1">
                 <p className="max-w-[16rem] text-[1.05rem] font-black leading-[1.05] tracking-wide text-white sm:max-w-none sm:text-xl lg:text-2xl">
-                  PEACE STREET BRIDGE TRACKER
+                  PEACE STREET BRIDGE TRUCK STRIKE TRACKER
                 </p>
                 <p className="mt-1 text-[0.66rem] font-black uppercase leading-tight tracking-[.14em] text-amber-400 sm:text-xs lg:text-sm">
                   Raleigh, North Carolina
@@ -222,6 +209,42 @@ export default async function HomePage() {
         {!isSupabaseConfigured && (
           <div className="rounded-2xl bg-amber-100 p-4 text-amber-900">Demo mode: connect Supabase to load live and historical data.</div>
         )}
+
+        <section className="grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
+          <div className="rounded-3xl bg-white p-5 shadow-xl sm:p-7">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Where is the bridge?</p>
+            <h2 className="mt-1 text-2xl font-black sm:text-3xl">Peace Street railroad bridge</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+              The low-clearance Norfolk Southern railroad bridge crosses Peace Street near N West Street and Capital Boulevard, just northwest of downtown Raleigh.
+            </p>
+            <p className="mt-3 text-sm font-bold text-slate-800">Location: Peace Street at the railroad crossing near N West St, Raleigh, NC</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Peace+Street+railroad+bridge+Raleigh+NC"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-xl bg-sky-700 px-5 py-3 font-black text-white hover:bg-sky-800"
+              >
+                📍 Open in Google Maps ↗
+              </a>
+            </div>
+          </div>
+
+          <div className="rounded-3xl bg-[#0b1529] p-5 text-white shadow-xl sm:p-7">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-400">Saw it happen?</p>
+            <h2 className="mt-1 text-2xl font-black">Help document a strike</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              Submit the time, what you saw and an optional photo. Community reports remain private until an admin verifies and approves them.
+            </p>
+            <div className="mt-5">
+              <CommunityStrikeReport />
+            </div>
+          </div>
+        </section>
+
+        <TruckClearanceGraphic />
+
+        <StrikePatterns incidents={incidents} />
 
         <section id="gallery" className="scroll-mt-28 rounded-3xl bg-white p-5 shadow-xl sm:p-7">
           <div className="flex flex-col gap-2 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">

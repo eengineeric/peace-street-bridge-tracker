@@ -3,14 +3,14 @@ import { ServiceWorkerRegistration } from "@/components/service-worker-registrat
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Peace Street Bridge Tracker",
+  title: "Peace Street Bridge Truck Strike Tracker",
   description: "Tracks truck strikes at Raleigh's Peace Street railroad bridge.",
-  applicationName: "Peace Street Bridge Tracker",
+  applicationName: "Peace Street Bridge Truck Strike Tracker",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Bridge Tracker",
+    title: "Truck Strike Tracker",
   },
   icons: {
     icon: [

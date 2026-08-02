@@ -294,3 +294,20 @@ If no strikes have been recorded in the new year, it displays 0.
 
 Automatic news and Reddit scanning remains scheduled every 30 minutes, and the
 website's historical coverage note states that frequency.
+
+
+## Version 2.8 — beta feedback feature set
+
+Run `supabase/v2.8-community-reports.sql`.
+
+Improvements from beta feedback:
+- Site/app name is now **Peace Street Bridge Truck Strike Tracker**.
+- Added a to-scale educational vehicle-height vs. 12′4″ clearance graphic.
+- Added a Google Maps location section for the Peace Street railroad bridge near N West Street / Capital Boulevard.
+- Added day-of-week and time-of-day strike visualizations. Imprecise archival timestamps are excluded from the time-of-day chart.
+- Added community incident reports with optional photo upload. Submissions stay pending until admin approval; approval runs through the same physical-event deduplication logic before changing public counts.
+- `/admin` now shows pending community reports with Approve/Reject controls.
+- Mobile hamburger navigation closes automatically after a menu selection, outside tap, or Escape instead of requiring another hamburger click.
+- Existing 30-minute scanner schedule, dynamic annual strike count, beta feedback, push alerts, RPD integration, and current visual design remain in place.
+
+Community photo uploads use the public Supabase Storage bucket `community-strike-photos`; uploads are performed only through the server-side service-role API.
