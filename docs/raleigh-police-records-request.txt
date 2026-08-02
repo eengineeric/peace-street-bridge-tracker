@@ -1,0 +1,36 @@
+City of Raleigh / Raleigh Police Department public-records request
+
+Subject: Peace Street railroad bridge crash-record index, 1954-present
+
+Please provide any available Raleigh Police Department records, crash-report indexes,
+CAD records, traffic collision databases, or statistical summaries identifying motor
+vehicles that struck, collided with, became lodged beneath, or otherwise made contact
+with the railroad bridge/overpass over Peace Street near North West Street / Capital
+Boulevard in Raleigh.
+
+Requested date range: January 1, 1954 through present.
+
+If available electronically, please provide:
+- incident/crash date
+- incident/crash time
+- report/case/crash number
+- location
+- vehicle/body type
+- crash description or narrative
+- contributing circumstances
+- disposition
+
+I am primarily requesting an electronic index, spreadsheet, CSV, database extract, or
+statistical report rather than individual report PDFs where possible. If a complete
+electronic index is not available, please provide the closest existing electronic
+record or identify the date ranges for which records can be searched.
+
+The purpose is historical research concerning repeated vehicle impacts with the Peace
+Street railroad bridge.
+
+Official City records-request information:
+https://raleighnc.gov/ask-raleigh-fix-report-request/services/records-request
+
+Raleigh Police Records Division:
+police.records@raleighnc.gov
+919-996-3325

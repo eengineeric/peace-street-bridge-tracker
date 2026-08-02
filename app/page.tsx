@@ -138,9 +138,13 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className="flex items-start justify-between gap-2 lg:hidden">
-              <div className="min-w-0 flex-1"><NotificationButton /></div>
-              <MobileMenu />
+            <div className="grid gap-2 lg:hidden">
+              <div className="flex items-center justify-end">
+                <MobileMenu />
+              </div>
+              <div className="w-full rounded-2xl border border-amber-300/15 bg-amber-300/[0.04] p-2">
+                <NotificationButton prominent />
+              </div>
             </div>
           </div>
         </div>

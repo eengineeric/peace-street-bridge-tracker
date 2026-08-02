@@ -1,0 +1,2 @@
+report_number,incident_date,incident_time,location,vehicle_type,narrative,contributing_circumstances
+EXAMPLE-001,1976-11-19,14:30,Peace Street railroad bridge Raleigh NC,tractor-trailer,Truck struck and became lodged under railroad bridge,Failure to follow truck route

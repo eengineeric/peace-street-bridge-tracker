@@ -207,3 +207,26 @@ The strike-alert button now has explicit checking, enabling, enabled, and retry 
 - Uses the approved uphill Peace Street bridge hero with the peeled sardine can and acorn in front.
 - Keeps only the real functional navigation row; no navigation controls are baked into the hero artwork.
 - Retains the sardine-can + acorn PWA/home-screen icon.
+
+
+## Version 2.5.10
+
+The installed mobile app now renders a full-width strike-alert control directly beneath the mobile header. The service-worker cache version was also bumped so existing PWA installs pick up the new interface on update.
+
+
+## Version 2.6 — Raleigh Police historical records
+
+Run `supabase/v2.6-rpd-records.sql` after the existing migrations.
+
+The admin page now accepts a CSV export from Raleigh Police / City records. It recognizes
+common header variants for report number, date, time, location, vehicle type, narrative,
+and contributing circumstances.
+
+Matching rules:
+- unique RPD report number prevents duplicate police imports;
+- timed police records within 90 minutes of an existing incident are linked to it;
+- a day-only RPD record is linked only when exactly one incident is already known that day;
+- otherwise the RPD report creates a separate incident, preserving multiple strikes per day.
+
+See `docs/raleigh-police-records-request.txt` for the recommended records request and
+`docs/rpd-import-template.csv` for a sample import layout.
