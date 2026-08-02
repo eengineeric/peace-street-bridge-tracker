@@ -1,6 +1,74 @@
 import { BridgeIncident, BridgeReport, BridgeMilestone, OfficialBridgeStat } from "@/lib/types";
 import { isSupabaseConfigured, requireServerConfig } from "@/lib/config";
 
+
+function decodeHtmlAttribute(value: string) {
+  return value
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
+}
+
+function looksLikeArticleImage(url: string) {
+  const lower = url.toLowerCase();
+  return (
+    /^https?:\/\//i.test(url) &&
+    !/\b(logo|icon|avatar|favicon|sprite|placeholder|default[-_]?image|weather|tracking|pixel)\b/i.test(lower) &&
+    !lower.endsWith(".svg")
+  );
+}
+
+async function extractSourceImageUrl(sourceUrl: string): Promise<string | null> {
+  try {
+    const response = await fetch(sourceUrl, {
+      headers: {
+        "User-Agent": "PeaceStreetBridgeTracker/2.6.2 (+historical incident archive)",
+        Accept: "text/html,application/xhtml+xml",
+      },
+      cache: "no-store",
+      redirect: "follow",
+    });
+    if (!response.ok) return null;
+
+    const html = (await response.text()).slice(0, 1_500_000);
+    const patterns = [
+      /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["'][^>]*>/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["'][^>]*>/i,
+      /<meta[^>]+name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["'][^>]*>/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image(?::src)?["'][^>]*>/i,
+    ];
+
+    for (const pattern of patterns) {
+      const match = html.match(pattern);
+      const candidate = match?.[1] ? decodeHtmlAttribute(match[1].trim()) : "";
+      if (candidate && looksLikeArticleImage(candidate)) return candidate;
+    }
+  } catch {
+    // Photo enrichment is best-effort and should never block incident registration.
+  }
+  return null;
+}
+
+async function attachSourceImage(reportId: string, incidentId: string, sourceUrl: string) {
+  const imageUrl = await extractSourceImageUrl(sourceUrl);
+  if (!imageUrl) return;
+
+  await supabaseRequest<BridgeReport[]>(`bridge_reports?id=eq.${encodeURIComponent(reportId)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ image_url: imageUrl }),
+  });
+
+  await supabaseRequest<BridgeIncident[]>(
+    `bridge_incidents?id=eq.${encodeURIComponent(incidentId)}&image_url=is.null`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ image_url: imageUrl }),
+    },
+  );
+}
+
 async function supabaseRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const { url, key } = requireServerConfig();
   const response = await fetch(`${url}/rest/v1/${path}`, {
@@ -122,7 +190,17 @@ export async function registerAutomaticReport(
     throw new Error(`Automatic registration failed (${response.status}): ${detail}`);
   }
 
-  return (await response.json()) as RegisterReportResult;
+  const result = (await response.json()) as RegisterReportResult;
+
+  // Best-effort photo enrichment. This does not affect deduplication or whether
+  // an incident is accepted; it only attaches a verified source-page image.
+  try {
+    await attachSourceImage(result.report_id, result.incident_id, input.source_url);
+  } catch {
+    // Keep scanner resilient if a publisher blocks image/page requests.
+  }
+
+  return result;
 }
 
 export async function recordSkippedReport(input: {

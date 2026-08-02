@@ -22,11 +22,19 @@ export function ReportList({ incidents }: { incidents: BridgeIncident[] }) {
       {incidents.length === 0 ? <p className="py-8 text-slate-500">No incidents are loaded yet.</p> : (
         <div className="mt-6 grid gap-5 lg:grid-cols-2">
           {incidents.map((incident) => {
-            const image = incident.image_url || incident.sources?.find((s) => s.image_url)?.image_url;
+            const imageSource = incident.sources?.find((s) => s.image_url);
+            const image = incident.image_url || imageSource?.image_url;
             return (
               <article id={`incident-${incident.id}`} key={incident.id} className="scroll-mt-32 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
                 <div className="relative h-48 bg-slate-200 bg-cover bg-center" style={{ backgroundImage: `url(${image || "/bridge.svg"})` }}>
-                  {!image && <div className="absolute inset-x-0 bottom-0 bg-slate-950/75 px-3 py-2 text-xs font-semibold text-white">No archived incident photo located</div>}
+                  {image ? (
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-slate-950/75 px-3 py-2 text-[11px] font-semibold text-white">
+                      <span>Incident photo{imageSource?.source_name ? ` · ${imageSource.source_name}` : ""}</span>
+                      {imageSource?.source_url ? <a href={imageSource.source_url} target="_blank" rel="noreferrer" className="underline decoration-white/50 underline-offset-2">Source ↗</a> : null}
+                    </div>
+                  ) : (
+                    <div className="absolute inset-x-0 bottom-0 bg-slate-950/75 px-3 py-2 text-xs font-semibold text-white">No archived incident photo located</div>
+                  )}
                 </div>
                 <div className="p-5">
                   <div className="flex flex-wrap items-center gap-2">

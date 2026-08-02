@@ -11,9 +11,31 @@ function localDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
 }
 
-function daysSince(iso?: string) {
-  if (!iso) return "—";
-  return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
+function raleighToday() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((part) => part.type === type)?.value ?? 0);
+
+  return { year: value("year"), month: value("month"), day: value("day") };
+}
+
+function daysSince(incidentDate?: string) {
+  if (!incidentDate) return "—";
+
+  const match = incidentDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return "—";
+
+  const incidentUtc = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  const today = raleighToday();
+  const todayUtc = Date.UTC(today.year, today.month - 1, today.day);
+
+  return Math.max(0, Math.round((todayUtc - incidentUtc) / 86400000));
 }
 
 function HeaderNav({ mobile = false }: { mobile?: boolean }) {
@@ -173,7 +195,7 @@ export default async function HomePage() {
             <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
               <Metric
                 label="Days since last strike"
-                value={String(daysSince(latest?.incident_at))}
+                value={String(daysSince(latest?.incident_date))}
                 detail={latest ? new Date(latest.incident_at).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" }) : "No incident loaded"}
               />
               <Metric label={`Strikes in ${year}`} value={String(thisYear)} detail="Individually documented events" />

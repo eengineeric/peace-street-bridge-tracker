@@ -247,3 +247,17 @@ Changes:
   results on supported mobile PWAs.
 - iPhone browser use now explains that push alerts require adding the tracker to
   the Home Screen rather than simply saying alerts are unavailable.
+
+
+## Version 2.6.2 — Raleigh calendar counter + incident photos
+
+Run `supabase/v2.6.2-calendar-days-incident-photos.sql` (corrected photo backfill).
+
+- "Days since last strike" is now the difference between Raleigh calendar dates,
+  not elapsed 24-hour periods. Example: Jul 30 -> Aug 2 displays 3.
+- Verified WRAL/ABC11 incident images are backfilled where a direct article image
+  was located.
+- Future scanner registrations best-effort read `og:image` / `twitter:image`
+  from source pages and attach qualifying images to the report/incident.
+- The archive retains "No archived incident photo located" when no specific
+  incident image can be verified; unrelated photos are not substituted.
