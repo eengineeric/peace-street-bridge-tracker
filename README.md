@@ -311,3 +311,16 @@ Improvements from beta feedback:
 - Existing 30-minute scanner schedule, dynamic annual strike count, beta feedback, push alerts, RPD integration, and current visual design remain in place.
 
 Community photo uploads use the public Supabase Storage bucket `community-strike-photos`; uploads are performed only through the server-side service-role API.
+
+
+## Version 2.8.1 — 30-minute scan scheduling fix for Vercel Hobby
+
+Vercel Hobby permits cron jobs only once per day. The frequent Vercel cron has therefore
+been removed. `.github/workflows/scan.yml` now triggers the existing secured scan endpoint
+every 30 minutes through GitHub Actions.
+
+Add these GitHub repository secrets before relying on the scheduled scan:
+- `SCAN_URL` = `https://peace-street-bridge-tracker.vercel.app/api/cron/scan`
+- `CRON_SECRET` = the same `CRON_SECRET` already configured in Vercel.
+
+See `docs/github-30-minute-scanner.md`.
