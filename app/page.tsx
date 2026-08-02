@@ -210,23 +210,37 @@ export default async function HomePage() {
           <div className="rounded-2xl bg-amber-100 p-4 text-amber-900">Demo mode: connect Supabase to load live and historical data.</div>
         )}
 
-        <section className="grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
-          <div className="rounded-3xl bg-white p-5 shadow-xl sm:p-7">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Where is the bridge?</p>
-            <h2 className="mt-1 text-2xl font-black sm:text-3xl">Peace Street railroad bridge</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-              The low-clearance Norfolk Southern railroad bridge crosses Peace Street near N West Street and Capital Boulevard, just northwest of downtown Raleigh.
-            </p>
-            <p className="mt-3 text-sm font-bold text-slate-800">Location: Peace Street at the railroad crossing near N West St, Raleigh, NC</p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <a
-                href="https://www.google.com/maps/search/?api=1&query=Peace+Street+railroad+bridge+Raleigh+NC"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-xl bg-sky-700 px-5 py-3 font-black text-white hover:bg-sky-800"
-              >
-                📍 Open in Google Maps ↗
-              </a>
+        <section className="grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
+          <div className="overflow-hidden rounded-3xl bg-white shadow-xl">
+            <div className="p-5 sm:p-7">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Where is the bridge?</p>
+              <h2 className="mt-1 text-2xl font-black sm:text-3xl">Peace Street railroad bridge</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+                The low-clearance Norfolk Southern railroad bridge crosses Peace Street near N West Street and Capital Boulevard,
+                just northwest of downtown Raleigh.
+              </p>
+              <p className="mt-3 text-sm font-bold text-slate-800">
+                Location: Peace Street at the railroad crossing near N West St, Raleigh, NC
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Peace+Street+railroad+bridge+Raleigh+NC"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-xl bg-sky-700 px-5 py-3 font-black text-white hover:bg-sky-800"
+                >
+                  📍 Open in Google Maps ↗
+                </a>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-200 bg-slate-100 p-2 sm:p-3">
+              <img
+                src="/peace-street-bridge-map.png"
+                alt="Map of Raleigh showing West Peace Street, North West Street, Capital Boulevard, and the railroad corridor around the Peace Street bridge."
+                className="h-auto w-full rounded-2xl border border-slate-200"
+                loading="lazy"
+              />
             </div>
           </div>
 

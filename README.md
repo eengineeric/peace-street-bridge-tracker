@@ -324,3 +324,12 @@ Add these GitHub repository secrets before relying on the scheduled scan:
 - `CRON_SECRET` = the same `CRON_SECRET` already configured in Vercel.
 
 See `docs/github-30-minute-scanner.md`.
+
+
+## Version 2.8.2 — realistic vehicle clearance graphic + on-page bridge map
+
+- Replaces the simple geometric truck SVG with the approved realistic vehicle comparison.
+- The 12′4″ dashed clearance line is on the same vertical scale as the vehicles; the 13′6″ semi visibly crosses above it.
+- Adds the supplied Raleigh map image directly to the bridge-location section.
+- Keeps the existing Google Maps link for interactive navigation.
+- Retains the GitHub Actions 30-minute scanner required for Vercel Hobby deployments.
