@@ -261,3 +261,26 @@ Run `supabase/v2.6.2-calendar-days-incident-photos.sql` (corrected photo backfil
   from source pages and attach qualifying images to the report/incident.
 - The archive retains "No archived incident photo located" when no specific
   incident image can be verified; unrelated photos are not substituted.
+
+
+## Version 2.7 — friends & family beta readiness
+
+Run `supabase/v2.7-beta-readiness.sql`.
+
+Adds:
+- missing mid-July 2026 strike so the supported 2026 count reaches five;
+- public "Beta · Report a problem" feedback form;
+- scanner run history with last successful scan and health status;
+- lightweight server/scanner error log;
+- explicit Disable strike alerts control after a subscription is enabled;
+- public confidence/source badges on incident archive cards;
+- admin merge and split controls for correcting scanner event grouping;
+- one-click JSON database backup/export from `/admin`;
+- recent beta feedback and error summaries on `/admin`.
+
+Recommended beta release workflow:
+1. Run the v2.7 SQL migration.
+2. Deploy the GitHub project.
+3. Open `/admin`, run one manual scan, and send one test notification.
+4. Download a database backup.
+5. Give the beta URL to friends and ask them to use the floating feedback button.

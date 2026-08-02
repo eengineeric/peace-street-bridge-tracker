@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ReportList } from "@/components/report-list";
 import { NotificationButton } from "@/components/notification-button";
+import { BetaFeedback } from "@/components/beta-feedback";
 import { getIncidents, getMilestones, getOfficialStats } from "@/lib/reports";
 import { isSupabaseConfigured } from "@/lib/config";
 
@@ -271,6 +272,7 @@ export default async function HomePage() {
 
         <section className="rounded-3xl bg-slate-900 p-6 text-sm leading-6 text-slate-300"><strong className="text-white">Historical coverage note.</strong> The tracker searches and seeds individually supportable records going back toward the bridge&apos;s 1954 construction. It does not claim a complete lifetime police ledger where source records are unavailable. Current scanning continues to monitor news and Reddit and can add multiple distinct strikes on the same day.</section>
       </div>
+      <BetaFeedback />
     </main>
   );
 }

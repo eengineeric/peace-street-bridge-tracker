@@ -186,6 +186,11 @@ export function NotificationButton({ prominent = false }: { prominent?: boolean 
         <span aria-hidden="true" className="mr-2">🔔</span>
         {label}
       </button>
+      {enabled ? (
+        <button type="button" onClick={disable} className="text-[0.68rem] font-bold text-slate-300 underline decoration-slate-500 underline-offset-2 hover:text-white sm:text-xs">
+          Disable strike alerts
+        </button>
+      ) : null}
       {installRequired ? (
         <span className="max-w-[22rem] text-center text-[0.68rem] leading-4 text-amber-200 sm:text-xs">
           iPhone web push works from the Home Screen app. In Safari, choose Share → Add to Home Screen.

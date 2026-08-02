@@ -41,6 +41,7 @@ export function ReportList({ incidents }: { incidents: BridgeIncident[] }) {
                     <p className="font-black text-amber-700">{fmtDate(incident.incident_at, incident.date_precision)}</p>
                     {incident.date_precision && !["exact", "day"].includes(incident.date_precision) && <span className="rounded-full bg-amber-100 px-2 py-1 text-[11px] font-bold uppercase text-amber-800">{incident.date_precision} date</span>}
                     {incident.evidence_level && <span className="rounded-full bg-slate-200 px-2 py-1 text-[11px] font-bold uppercase text-slate-600">{incident.evidence_level}</span>}
+                    {Number.isFinite(incident.confidence) && <span className="rounded-full bg-sky-100 px-2 py-1 text-[11px] font-bold uppercase text-sky-800">{Math.round(incident.confidence * 100)}% confidence</span>}
                   </div>
                   <h3 className="mt-2 text-xl font-black">{incident.title}</h3>
                   <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
@@ -51,7 +52,11 @@ export function ReportList({ incidents }: { incidents: BridgeIncident[] }) {
                   </dl>
                   {(incident.historical_notes || incident.match_notes) && <p className="mt-4 text-sm leading-6 text-slate-600">{incident.historical_notes || incident.match_notes}</p>}
                   <div className="mt-4 flex flex-wrap gap-3">
-                    {incident.sources?.map((source) => <a key={source.id} href={source.source_url} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700">{source.source_name}{source.source_kind === "reddit" ? " · Reddit" : ""} ↗</a>)}
+                    {incident.sources?.map((source) => (
+                      <a key={source.id} href={source.source_url} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700">
+                        {source.source_name} · {source.source_kind || "source"}{source.confidence ? ` · ${Math.round(source.confidence * 100)}%` : ""} ↗
+                      </a>
+                    ))}
                   </div>
                 </div>
               </article>
